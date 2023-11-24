@@ -11,48 +11,96 @@ import {
 import React, {useState, useEffect} from 'react';
 import {styles} from './styleToDo';
 import {NavigationContainer} from '@react-navigation/native';
+import {
+  AddTodo,
+  deleteTodo,
+  completeTodo,
+  updateTodo,
+} from './src/redux/actions/todoActions/todoAction';
+import {useDispatch, useSelector} from 'react-redux';
 
 function ParentToDo({navigation}) {
   const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState([]);
+  // const [tasks, setTasks] = useState([]);
   const [editIndex, setEditIndex] = useState(-1);
+
+  const dispatch = useDispatch();
+  const data = useSelector(state => state.todoReducer);
+  const tasks = data.todos;
+  console.log(tasks);
+
+  // const handleAddTask = () => {
+  //   if (task) {
+  //     dispatch(AddTodo(task));
+  //     setTask('');
+  //   } else {
+  //     Alert.alert('Task cannot be Empty');
+  //   }
+  // };
 
   const handleAddTask = () => {
     if (task)
       if (editIndex !== -1) {
-        const updatedTasks = [...tasks];
-        if (editIndex < updatedTasks.length) {
-          updatedTasks[editIndex].text = task;
-          setTasks(updatedTasks);
-          setTask('');
-          setEditIndex(-1);
-        }
+        dispatch(updateTodo(editIndex, task));
+        setEditIndex(-1);
       } else {
-        setTasks([...tasks, {text: task, iscompleted: false}]);
-        setTask('');
+        dispatch(AddTodo(task));
       }
     else {
       Alert.alert('Task cannot be Empty');
     }
   };
 
-  const handleCompleteTask = index => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].iscompleted = !updatedTasks[index].iscompleted;
-    setTasks(updatedTasks);
+  // const handleAddTask = () => {
+  //   if (task)
+  //     if (editIndex !== -1) {
+  //       const updatedTasks = [...tasks];
+  //       if (editIndex < updatedTasks.length) {
+  //         updatedTasks[editIndex].text = task;
+  //         setTasks(updatedTasks);
+  //         setTask('');
+  //         setEditIndex(-1);
+  //       }
+  //     } else {
+  //       setTasks([...tasks, {text: task, iscompleted: false}]);
+  //       setTask('');
+  //     }
+  //   else {
+  //     Alert.alert('Task cannot be Empty');
+  //   }
+  // };
+
+  const handleCompleteTask = id => {
+    dispatch(completeTodo(id));
   };
 
-  const handleDeleteTask = index => {
-    const updatedTasks = [...tasks];
-    updatedTasks.splice(index, 1);
-    setTasks(updatedTasks);
+  // const handleCompleteTask = index => {
+  //   const updatedTasks = [...tasks];
+  //   updatedTasks[index].iscompleted = !updatedTasks[index].iscompleted;
+  //   setTask(updatedTasks);
+  // };
+
+  const handleDeleteTask = id => {
+    dispatch(deleteTodo(id));
   };
+
+  // const handleDeleteTask = index => {
+  //   const updatedTasks = [...tasks];
+  //   updatedTasks.splice(index, 1);
+  //   setTasks(updatedTasks);
+  // };
 
   const handleEditTask = index => {
     const taskToEdit = tasks[index];
     setTask(tasks[index].text);
     setEditIndex(index);
   };
+
+  // const handleEditTask = index => {
+  //   const taskToEdit = tasks[index];
+  //   setTask(tasks[index].text);
+  //   setEditIndex(index);
+  // };
 
   const renderItem = ({item, index}) => (
     <View style={styles.task}>
@@ -68,7 +116,7 @@ function ParentToDo({navigation}) {
         {item.text}
       </Text>
       <View style={styles.taskButtons}>
-        <TouchableOpacity onPress={() => handleCompleteTask(index)}>
+        <TouchableOpacity onPress={() => handleCompleteTask(item.id)}>
           {/* // disabled={item.iscompleted} */}
           <Text
             style={[
@@ -113,7 +161,7 @@ function ParentToDo({navigation}) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => handleDeleteTask(index)}
+          onPress={() => handleDeleteTask(item.id)}
           style={styles.deleteButton}>
           <Image source={require('./img/delete.png')}></Image>
           {/* <Text style={styles.deleteButton}>Del</Text> */}

@@ -13,25 +13,33 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {RadioButton} from 'react-native-paper';
 import {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
-import CheckBox from 'react-native-checkbox';
+// import CheckBox from '@react-native-community/checkbox';
 import Header from '../../components/Header';
-import home from '../Home/home';
+// import home from '../Home/Home';
 // import Assignment3 from '../../../Assignment3';
 
 const data = [
-  {label: 'Student', value: 1},
-  {label: 'Fresher (0-2)', value: 2},
-  {label: 'Experienced', value: 3},
+  {label: 'Student', value: 'Student'},
+  {label: 'Fresher (0-2)', value: 'Fresher with experience less than 2 years'},
+  {label: 'Experienced', value: 'Experienced'},
 ];
 
-function register({navigation}) {
+const genders = ['Male', 'Female'];
+
+const programmingLanguagesList = ['JavaScript', 'Python', 'Java'];
+
+function Register({navigation}) {
   const [selectedValue, setSelectedValue] = useState('');
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const [gender, setGender] = useState('');
+  const [programmingLanguages, setProgrammingLanguages] = useState([]);
+  const [experience, setExperience] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phoneno: '',
+    experience: '',
   });
   const handleValidation = () => {
     if (formData.name === '') {
@@ -47,14 +55,19 @@ function register({navigation}) {
     return true;
   };
 
-  const handleDateChange = date => {
-    setFormData({...formData, birthDate: date});
-  };
   const handleSubmit = () => {
     if (handleValidation()) {
-      navigation.navigate('home', {registrationData: formData});
+      navigation.navigate('Home', {
+        registrationData: formData,
+        experience,
+        gender,
+        programmingLanguages,
+        date: serializableDate,
+      });
     }
   };
+
+  const serializableDate = date.toJSON();
 
   return (
     <View style={styles.mainContainer}>
@@ -102,11 +115,12 @@ function register({navigation}) {
             </Pressable>
             <DatePicker
               modal
-              // onDateChange={handleDateChange}
-              // value={formData.birthDate}
               open={open}
               date={date}
               mode="date"
+              onDateChange={date => {
+                setDate(date);
+              }}
               onConfirm={date => {
                 setOpen(false);
                 setDate(date);
@@ -121,30 +135,24 @@ function register({navigation}) {
           <Text style={{fontSize: 20, color: 'white', width: '50%'}}>
             Select your Gender :
           </Text>
-          <View style={styles.radioButton}>
-            <RadioButton
-              value="option1"
-              status={selectedValue === 'option1' ? 'checked' : 'unchecked'}
-              onPress={() => setSelectedValue('option1')}
-              color="white"
-            />
-            <Text style={{marginTop: 7, fontSize: 15, color: 'white'}}>
-              Male
-            </Text>
-          </View>
-
-          <View style={styles.radioButton}>
-            <RadioButton
-              selectedValue={formData.gender}
-              value="option2"
-              status={selectedValue === 'option2' ? 'checked' : 'unchecked'}
-              onPress={() => setSelectedValue('option2')}
-              color="white"
-            />
-            <Text style={{marginTop: 7, fontSize: 15, color: 'white'}}>
-              Female
-            </Text>
-          </View>
+          {genders.map((gen, index) => (
+            <View key={index} style={styles.radioButton}>
+              <RadioButton
+                color="white"
+                value={gen}
+                status={gen === gender ? 'checked' : 'unchecked'}
+                onPress={() => setGender(gen)}
+              />
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  paddingTop: 4,
+                }}>
+                {gen}
+              </Text>
+            </View>
+          ))}
         </View>
         <View style={styles.experienceContainer}>
           <Text style={{fontSize: 20, color: 'white', width: '60%'}}>
@@ -156,19 +164,36 @@ function register({navigation}) {
             placeholder="Experience"
             labelField="label"
             valueField="value"
-            onChange={e => console.log('hiii', e)}
+            onChange={item => {
+              setExperience(item.value);
+            }}
           />
         </View>
-        <View style={styles.checkboxContainer}>
+        {/* <View style={styles.checkboxContainer}>
           <Text style={{fontSize: 20, color: 'white', width: '60%'}}>
             Select your Skills :
           </Text>
-          <View style={styles.checkboxesContainer}>
-            <CheckBox label="HTML" />
-            <CheckBox label="Java Script" />
-            <CheckBox label="React Native" />
-          </View>
-        </View>
+          {programmingLanguagesList.map((lang, index) => (
+            <View key={index} style={styles.checkBox}>
+              <CheckBox
+                tintColors={{true: 'white', false: 'grey'}}
+                value={programmingLanguages.includes(lang)}
+                onValueChange={() => {
+                  if (programmingLanguages.includes(lang)) {
+                    setProgrammingLanguages(
+                      programmingLanguages.filter(item => item !== lang),
+                    );
+                  } else {
+                    setProgrammingLanguages([...programmingLanguages, lang]);
+                  }
+                }}
+              />
+              <Text style={{color: 'white', fontSize: 20, alignSelf: 'center'}}>
+                {lang}
+              </Text>
+            </View>
+          ))}
+        </View> */}
         <View>
           <Pressable style={styles.submitContainer} onPress={handleSubmit}>
             <Text
@@ -188,4 +213,4 @@ function register({navigation}) {
   );
 }
 
-export default register;
+export default Register;

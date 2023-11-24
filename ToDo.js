@@ -1,6 +1,6 @@
 // import 'react-native-gesture-handler';
 import ParentToDo from './ParentToDo';
-import App from './App';
+import App from './BioHacker';
 import Assignment2 from './Assignment2';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';

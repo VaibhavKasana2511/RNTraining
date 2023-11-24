@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
   },
 
   headingText: {
-    flex: 1,
+    // paddingTop: 10,
+    flex: 1.5,
     // backgroundColor: 'purple',
     fontSize: 50,
     textAlign: 'center',
@@ -20,11 +21,12 @@ export const styles = StyleSheet.create({
 
   inputContainer: {
     // backgroundColor: 'pink',
-    flex: 3,
-    justifyContent: 'space-around',
+    flex: 4,
+    justifyContent: 'space-evenly',
   },
 
   inputStyle: {
+    // flex: 0.2,
     paddingLeft: 15,
     // width: '100%',
     backgroundColor: 'white',
@@ -37,7 +39,7 @@ export const styles = StyleSheet.create({
     flex: 5,
     // width: '100%',
     marginHorizontal: 20,
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
 
   dateContainer: {
@@ -79,10 +81,13 @@ export const styles = StyleSheet.create({
   },
 
   checkboxContainer: {
+    width: '100%',
+    // flexDirection: 'row',
+  },
+  checkBox: {
+    // width: '40%',
     flexDirection: 'row',
   },
-  checkboxesContainer: {},
-
   submitContainer: {
     backgroundColor: 'white',
     width: '100%',
