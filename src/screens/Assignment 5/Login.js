@@ -10,28 +10,40 @@ import {
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useState} from 'react';
+import {loginUser} from '../../redux/actions/userActions/userAction';
 
 export default function Login({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const dispatch = useDispatch();
-  const userState = useSelector(state => state.userReducer.user);
-  console.log('Login', userState);
-  // console.log('email', userState.email);
-  // console.log(email);
+  const registeredUser = useSelector(state => state.userReducer.user);
+  console.log('Login', registeredUser);
 
   const handleSignUp = () => {
     navigation.navigate('Register');
   };
 
   const handleLogin = () => {
-    if (email !== userState.email && password !== userState.password) {
-      Alert.alert('Invalid Credentials');
+    const user = {email, password};
+
+    const matchingUsers = registeredUser.filter(
+      registeredUser =>
+        registeredUser.email === user.email &&
+        registeredUser.password === user.password,
+    );
+
+    if (matchingUsers.length > 0) {
+      let phone = matchingUsers[0].phone;
+      let name = matchingUsers[0].name;
+      console.log('MATCHING', matchingUsers);
+      console.log('MATCHING USERS', phone, name);
+      dispatch(loginUser(email, password, phone, name));
+      // navigation.navigate('Home');
     } else {
-      navigation.navigate('Home');
+      Alert.alert('User does not exist');
     }
   };
-
   return (
     <View style={styles.mainContainer}>
       <View style={styles.loginContainer}>

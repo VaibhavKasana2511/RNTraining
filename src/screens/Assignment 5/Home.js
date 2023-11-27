@@ -1,9 +1,16 @@
 import {View, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-export default function Home() {
-  const userState = useSelector(state => state.userReducer.user);
+import {logoutUser} from '../../redux/actions/userActions/userAction';
+export default function Home({navigation}) {
+  const userState = useSelector(state => state.userReducer.login_user);
   console.log('Home', userState);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    // navigation.navigate('Login');
+    dispatch(logoutUser());
+  };
   return (
     <View
       style={{
@@ -28,10 +35,13 @@ export default function Home() {
           Your Email : {userState.email}
         </Text>
         <Text style={{color: 'black', fontSize: 25, textAlign: 'center'}}>
+          Your Password : {userState.password}
+        </Text>
+        <Text style={{color: 'black', fontSize: 25, textAlign: 'center'}}>
           Your Contact : {userState.phone}
         </Text>
-
         <TouchableOpacity
+          onPress={handleLogout}
           style={{
             backgroundColor: 'pink',
             // width: '100%',

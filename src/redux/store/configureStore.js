@@ -21,6 +21,11 @@ const persistedReducer = persistReducer(persistConfig, reducer);
 const store = configureStore({
   reducer: persistedReducer,
   // middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }).concat(logger),
   // other store configuration options
 });
 

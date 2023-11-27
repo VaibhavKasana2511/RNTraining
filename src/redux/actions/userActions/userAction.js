@@ -5,9 +5,9 @@ export const registerUser = (name, email, phone, password) => ({
   payload: {name, email, phone, password},
 });
 
-export const loginUser = user => ({
+export const loginUser = (email, password, phone, name) => ({
   type: LOGIN_USER,
-  payload: {email, password, rememberMe},
+  payload: {email, password, phone, name},
 });
 
 export const logoutUser = () => ({
