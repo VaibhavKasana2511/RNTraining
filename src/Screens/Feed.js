@@ -12,54 +12,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchPosts} from '../Services/api';
 import PostDetails from './PostDetails';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {addPost} from '../Redux/action/authAction';
 
 const Feed = () => {
   const dispatch = useDispatch();
-
+  const posts = useSelector(state => state.feed.posts);
   const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('https://dummyapi.io/data/v1/post/', {
-          headers: {
-            'Content-Type': 'application/json',
-            'app-id': '65b2433a2fe979ac57fe617f',
-          },
-        });
-
-        if (response.ok && isMounted) {
-          const data = await response.json();
-          setSelectedPost(data.data); // Assuming 'data' is the property containing user data
-        } else {
-          console.error('Error fetching user data:', response.status);
-        }
+        const postsData = await fetchPosts();
+        dispatch(addPost(postsData));
       } catch (error) {
-        console.error('Error during API call:', error);
+        console.error('Error fetching posts:', error);
       }
     };
 
-    fetchUserData();
-
-    return () => {
-      isMounted = false; // Cleanup to prevent state updates on unmounted component
-    };
-  }, []);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const postsData = await fetchPosts();
-  //       dispatch(addPost(postsData));
-  //     } catch (error) {
-  //       console.error('Error fetching posts:', error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [dispatch]);
+    fetchData();
+  }, [dispatch]);
 
   const handleCommentIconPress = post => {
     setSelectedPost(selectedPost === post ? null : post);
@@ -70,44 +41,37 @@ const Feed = () => {
   };
 
   const renderPost = ({item}) => (
-    console.log('Hey iitemm,n cn cm', item),
-    (
-      <TouchableOpacity
-        style={styles.postContainer}
-        onPress={() => handleCommentIconPress(item)}>
-        <View style={styles.userInfo}>
-          <Image
-            source={{uri: item.owner.picture}}
-            style={styles.profileImage}
-          />
-          <Text style={styles.username}>
-            {item.owner.firstName} {item.owner.lastName}
-          </Text>
-        </View>
-        <Text style={styles.postText}>{item.text}</Text>
-        {item.image && (
-          <Image source={{uri: item.image}} style={styles.postImage} />
-        )}
+    <TouchableOpacity
+      style={styles.postContainer}
+      onPress={() => handleCommentIconPress(item)}>
+      <View style={styles.userInfo}>
+        <Image source={{uri: item.owner.picture}} style={styles.profileImage} />
+        <Text style={styles.username}>
+          {item.owner.firstName} {item.owner.lastName}
+        </Text>
+      </View>
+      <Text style={styles.postText}>{item.text}</Text>
+      {item.image && (
+        <Image source={{uri: item.image}} style={styles.postImage} />
+      )}
 
-        {/* Comment Icon */}
-        <View style={styles.commentIconContainer}>
-          <FontAwesome
-            style={styles.commentIcon}
-            name="comment-o"
-            size={20}
-            color="#000000"
-          />
-          <Text style={styles.commentCount}>{item.comments.length}</Text>
-        </View>
-      </TouchableOpacity>
-    )
+      {/* Comment Icon */}
+      <View style={styles.commentIconContainer}>
+        <FontAwesome
+          style={styles.commentIcon}
+          name="comment-o"
+          size={20}
+          color="#000000"
+        />
+        <Text style={styles.commentCount}>{item.comments.length}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Feed Screen</Text>
       <FlatList
-        data={selectedPost}
+        data={posts}
         keyExtractor={post => post.id}
         renderItem={renderPost}
         extraData={selectedPost}

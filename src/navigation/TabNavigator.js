@@ -17,7 +17,7 @@ const TabNavigator = () => {
       screenOptions={{
         tabBarLabel: () => null, // Hide tab bar labels
       }}>
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Feed"
         component={Feed}
         options={{
@@ -26,7 +26,7 @@ const TabNavigator = () => {
             <Image source={require('../assets/images/HomeLight.png')} />
           ),
         }}
-      /> */}
+      />
       <Tab.Screen
         name="CreatePost"
         component={CreatePost}
