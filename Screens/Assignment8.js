@@ -15,6 +15,7 @@ const Assignment8 = () => {
   const scaleValue = useRef(new Animated.Value(1)).current;
   const bounceValue = useRef(new Animated.Value(1)).current;
   const rotateValue = useRef(new Animated.Value(0)).current;
+  const flipValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const sequenceAnimation = () => {
@@ -40,25 +41,25 @@ const Assignment8 = () => {
     };
   }, [scaleValue]);
 
-  // useEffect(() => {
-  //   const flipSequence = () => {
-  //     Animated.loop(
-  //       Animated.sequence([
-  //         Animated.timing(flipValue, {
-  //           toValue: 1,
-  //           duration: 1000,
-  //           useNativeDriver: true,
-  //         }),
-  //         Animated.timing(flipValue, {
-  //           toValue: 0,
-  //           duration: 1000,
-  //           useNativeDriver: true,
-  //         }),
-  //       ]),
-  //     ).start();
-  //   };
-  //   flipSequence();
-  // }, [flipValue]);
+  useEffect(() => {
+    const flipSequence = () => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(flipValue, {
+            toValue: 1,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(flipValue, {
+            toValue: 0,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    };
+    flipSequence();
+  }, [flipValue]);
 
   useEffect(() => {
     const rotationSequence = () => {
@@ -78,15 +79,15 @@ const Assignment8 = () => {
     outputRange: ['0deg', '360deg'],
   });
 
-  // const frontInterpolate = flipValue.interpolate({
-  //   inputRange: [0, 1],
-  //   outputRange: ['0deg', '360deg'],
-  // });
+  const frontInterpolate = flipValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  });
 
-  // const backInterpolate = flipValue.interpolate({
-  //   inputRange: [0, 1],
-  //   outputRange: ['360deg', '720deg'],
-  // });
+  const backInterpolate = flipValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['180deg', '360deg'],
+  });
 
   const bounceAnimation = () => {
     Animated.spring(bounceValue, {
@@ -119,22 +120,32 @@ const Assignment8 = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        style={[styles.flipCard, {transform: [{rotate: rotateInterpolate}]}]}>
-        <Image style={styles.Image} source={require('./1.png')} />
+        style={[styles.rotateCard, {transform: [{rotate: rotateInterpolate}]}]}>
+        <Image
+          style={styles.Image}
+          source={require('../assets/images/1.png')}
+        />
       </TouchableOpacity>
-      {/* <TouchableOpacity
-        style={[
-          styles.flipCard,
-          styles.flipCardBack,
-          {transform: [{rotateY: backInterpolate}]},
-        ]}>
-        <Image style={styles.Image} source={require('./1.png')} />
-      </TouchableOpacity> */}
-
-      <Text style={{color: '#000000', fontWeight: 'bold'}}>Offers</Text>
-      <Text style={{color: '#006256', fontStyle: 'italic'}}>
-        Flat Discounts
+      <Text style={{color: 'black', fontWeight: 'bold', marginTop: 5}}>
+        Offers
       </Text>
+      <Text style={{color: 'black', fontWeight: 'bold'}}>Flat Discounts</Text>
+      <View style={styles.flipContainer}>
+        <TouchableOpacity
+          style={[styles.flipCard, {transform: [{rotateY: frontInterpolate}]}]}>
+          <Image
+            style={styles.Image}
+            source={require('../assets/images/1.png')}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.flipCard, {transform: [{rotateY: backInterpolate}]}]}>
+          <Image
+            style={styles.Image}
+            source={require('../assets/images/2.png')}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -148,10 +159,8 @@ const styles = StyleSheet.create({
   },
 
   textInput: {
-    // backgroundColor: 'red',
     flex: 0.85,
-    // borderWidth: 0.3,
-    // paddingLeft: 10,
+    marginVertical: 1,
   },
 
   inputContainer: {
@@ -170,8 +179,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backfaceVisibility: 'hidden',
     marginTop: 15,
-    // position: 'absolute',
-    // top: 100,
+    position: 'absolute',
+    top: 100,
+  },
+
+  rotateCard: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backfaceVisibility: 'hidden',
+    marginTop: 15,
   },
 
   Icon: {
@@ -192,5 +210,10 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 15,
     resizeMode: 'contain',
+  },
+
+  flipContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
