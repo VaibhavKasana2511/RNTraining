@@ -2,7 +2,11 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import CameraScreen from '../Screens/CameraScreen';
-import TabNavigator from './TabNavigator';
+import {TouchableOpacity} from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
+import {handleDatabase} from '../src/FireBaseDataBase/FirebaseDatabase';
+import Home from '../Screens/Home';
+import Post from '../Screens/Post';
 
 const Stack = createStackNavigator();
 
@@ -11,14 +15,46 @@ const RootNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="TabNavigator"
-          component={TabNavigator}
-          options={{headerShown: false}}
+          name="Home"
+          component={Home}
+          options={({navigation}) => ({
+            title: 'My Posts',
+            headerShown: true,
+            headerStyle: {backgroundColor: '#1C6758'},
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              // fontWeight: 'bold',
+            },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('CameraScreen')}>
+                <Feather
+                  name="plus-square"
+                  size={30}
+                  color="white"
+                  style={{marginRight: 15}}
+                />
+              </TouchableOpacity>
+            ),
+          })}
         />
         <Stack.Screen
           name="CameraScreen"
           component={CameraScreen}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Post"
+          component={Post}
+          options={{
+            title: 'Post',
+            headerShown: true,
+            headerStyle: {backgroundColor: '#1C6758'},
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

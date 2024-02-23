@@ -3,11 +3,7 @@ import {Provider} from 'react-redux';
 // import store from './src /redux/store/store';
 import SplashScreen from 'react-native-splash-screen';
 import RootNavigator from './Navigation/RootNavigator';
-import {handleDatabase} from './handleDatabase';
-import {Filter} from './Filter';
-import Test from './Test';
-
-// handleDatabase();
+import Assignment8 from './Assignment8';
 
 const App = () => {
   useEffect(() => {
@@ -16,7 +12,7 @@ const App = () => {
 
   return (
     // <Provider store={store}>
-    <Test />
+    <Assignment8 />
     // </Provider>
   );
 };

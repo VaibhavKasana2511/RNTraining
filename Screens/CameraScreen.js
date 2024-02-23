@@ -16,19 +16,19 @@ import {
 } from 'react-native-vision-camera';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ImagePicker from 'react-native-image-crop-picker';
+import RNFS from 'react-native-fs';
 import {CombinedFiltersImage, GrayscaledImage} from '../Filter';
 import Scroll from '../Scroll';
 
 const CameraScreen = ({navigation}) => {
   const camera = useRef(null);
   const [photo, setPhoto] = useState();
-  const [video, setVideo] = useState();
   const [flash, setFlash] = useState('off');
   const [showCamera, setShowCamera] = useState(true);
   const [cameraType, setCameraType] = useState('back');
   const device = useCameraDevice(cameraType);
-  const [isRecording, setIsRecording] = useState(false);
   const {hasPermission, requestPermission} = useCameraPermission();
+
   const {
     hasPermission: microphonePermission,
     requestPermission: requestMicrophonePermission,
@@ -51,7 +51,7 @@ const CameraScreen = ({navigation}) => {
 
   useEffect(() => {
     const cameraScreen = navigation.addListener('focus', () => {
-      setPhoto(undefined); // Reset photo state when navigating back to CameraScreen
+      setPhoto(undefined);
     });
 
     return cameraScreen;
@@ -74,25 +74,6 @@ const CameraScreen = ({navigation}) => {
     setFlash(flash === 'off' ? 'on' : 'off');
   };
 
-  const onStartRecording = async () => {
-    if (!camera.current) {
-      return;
-    }
-    setIsRecording(true);
-    camera.current.startRecording({
-      onRecordingFinished: video => {
-        setIsRecording(false);
-        setVideo(video);
-        console.log(video);
-      },
-      onRecordingError: error => {
-        console.log(error);
-        setIsRecording(false);
-      },
-    });
-    console.log('Recording started:');
-  };
-
   const openImagePicker = () => {
     ImagePicker.openPicker({
       width: photo?.width || 300,
@@ -101,18 +82,18 @@ const CameraScreen = ({navigation}) => {
       includeBase64: true,
     })
       .then(image => {
-        setPhoto(image);
+        setPhoto(image.path);
       })
       .catch(error => {
-        console.log('Error picking image:', error);
+        if (ImagePicker.isCancel(error)) {
+          console.log('User cancelled image selection');
+        } else {
+          console.log('Error picking image:', error);
+        }
       });
   };
 
   const captureButton = async () => {
-    if (isRecording) {
-      camera.current?.stopRecording();
-      return;
-    }
     console.log('Taking Picture');
     const photo = await camera.current.takePhoto({
       flash,
@@ -121,22 +102,31 @@ const CameraScreen = ({navigation}) => {
     });
 
     console.log('Image captured:', photo);
-    const result = await fetch(`file://${photo.path}`);
-    console.log('result', result);
-    const data = await result.blob();
-    console.log('DATA', data);
     setPhoto(photo);
+    convertToBase64(photo);
   };
 
   const handleFlipCamera = () => {
     setCameraType(cameraType === 'back' ? 'front' : 'back');
   };
 
+  const convertToBase64 = async photo => {
+    try {
+      const base64Data = await RNFS.readFile(photo.path, 'base64');
+      console.log(photo.path, 'DATA');
+      const base64Post = `data:image/jpeg;base64,${base64Data.trim('')}`;
+      setPhoto(base64Post);
+      // console.log('photo', photo);
+      // console.log('base64', base64Post);
+    } catch (error) {
+      console.log('Error converting to base64:', error);
+    }
+  };
+
   const uploadImage = async () => {
     if (!photo) {
       return;
     }
-
     navigation.navigate('Post', {photo: photo});
   };
 
@@ -147,7 +137,7 @@ const CameraScreen = ({navigation}) => {
         style={StyleSheet.absoluteFill}
         photo
         device={device}
-        isActive={showCamera && !photo} //for showing camera disable or enable
+        isActive={showCamera && !photo}
         onPictureTaken={data => {
           const filteredImage = applyFilter(data.image);
           setPhoto(filteredImage);
@@ -157,7 +147,7 @@ const CameraScreen = ({navigation}) => {
       {photo ? (
         <>
           <Image
-            source={{uri: `file://${photo.path}`}}
+            source={{uri: `file://${photo}`}}
             style={StyleSheet.absoluteFill}
           />
 
@@ -169,9 +159,9 @@ const CameraScreen = ({navigation}) => {
             style={{top: 10, left: 10, position: 'absolute'}}
           />
           <View style={styles.uploadImageView}>
-            <Scroll url={`file://${photo.path}`} />
+            {/* <Scroll url={`file://${photo}`} /> */}
             <TouchableOpacity onPress={uploadImage}>
-              <Text style={styles.uploadImageText}>Upload</Text>
+              <Text style={styles.uploadImageText}>Save</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -217,7 +207,6 @@ const CameraScreen = ({navigation}) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={captureButton}
-              onLongPress={onStartRecording}
               style={{justifyContent: 'center'}}>
               <Image
                 source={require('../images/capture.png')}

@@ -8,24 +8,27 @@ import {
   Alert,
   ScrollView,
   KeyboardAvoidingView,
+  ImageBackground,
 } from 'react-native';
 import React, {useState} from 'react';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import database from '@react-native-firebase/database';
 
 const Post = ({navigation, route}) => {
-  const {photo} = route.params ? route.params : {};
-  console.log(photo, 'photuu');
+  // const {photo} = route.params ? route.params : {};
+  const photo = route.params?.photo;
   const [caption, setCaption] = useState('');
   const [posts, setPosts] = useState([]);
+  console.log('photo', photo);
 
   const openCamera = () => {
-    navigation.navigate('CameraScreen');
+    navigation.navigate('Home');
   };
 
   const uploadPost = () => {
     const user = {
-      uri: `data:${photo.mime};base64,${photo.data}`,
+      // uri: `data:${photo.mime};base64,${photo.data}`,
+      uri: photo,
       caption: caption,
     };
 
@@ -51,13 +54,17 @@ const Post = ({navigation, route}) => {
   };
 
   return (
-    <ScrollView style={styles.mainContainer}>
+    <KeyboardAvoidingView style={styles.mainContainer}>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Add Image</Text>
+
         {photo ? (
           <Image
             style={styles.image}
-            source={{uri: `data:${photo.mime};base64,${photo.data}`}}
+            source={{
+              uri: photo,
+              // uri: `data:${photo.mime};base64,${photo.data}`
+            }}
           />
         ) : (
           <>
@@ -100,7 +107,7 @@ const Post = ({navigation, route}) => {
           <Text style={styles.uploadTxt}>Upload</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -1,8 +1,37 @@
-import {StyleSheet, Text, View, Image, FlatList} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
+import Feather from 'react-native-vector-icons/Feather';
+import database from '@react-native-firebase/database';
 
-const Home = ({route}) => {
-  const {posts} = route.params ? route.params : {};
+const Home = ({route, navigation}) => {
+  // const {posts} = route.params ? route.params : {};
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const postsRef = database().ref('/users');
+    const postsChange = snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        const postsArray = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key],
+        }));
+        setPosts(postsArray);
+      }
+    };
+
+    postsRef.on('value', postsChange);
+
+    return () => postsRef.off('value', postsChange);
+  }, []);
 
   const renderPosts = ({item}) => (
     <View style={styles.postContainer}>
@@ -11,20 +40,23 @@ const Home = ({route}) => {
           <View style={styles.imageContainer}>
             <Image
               style={styles.image}
-              source={{uri: `file://${item.photo.path}`}}
+              source={{uri: item.uri}}
+              // resizeMode="contain"
             />
             <Text style={styles.caption}>{item.caption}</Text>
           </View>
         </>
       ) : (
-        <></>
+        <>
+          <Text>Post not available</Text>
+        </>
       )}
     </View>
   );
 
   const emptyData = () => (
     <View style={{alignItems: 'center', justifyContent: 'center'}}>
-      <Text style={{fontSize: 26, color: 'white'}}>No Posts Found!!</Text>
+      <Text style={{fontSize: 26, color: 'black'}}>No Posts Found!!</Text>
     </View>
   );
 
@@ -45,8 +77,8 @@ export default Home;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    padding: 10,
-    backgroundColor: 'black',
+    padding: 20,
+    // backgroundColor: 'green',
   },
 
   heading: {
@@ -60,21 +92,35 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     marginBottom: 20,
+    backgroundColor: '#F8F8FF',
+    borderWidth: 2,
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderColor: '#e6e6e6',
+    // opacity: 0.2,
   },
 
   imageContainer: {
+    // flex: 1,
     marginBottom: 5,
+    borderRadius: 10,
+    width: '100%',
+    // marginHorizontal: 10,
   },
 
   image: {
-    width: '100%',
     height: 250,
-    borderRadius: 10,
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 15,
+    borderWidth: 0.5,
+    borderColor: '#000000',
   },
 
   caption: {
     fontSize: 18,
-    color: 'white',
-    marginTop: 10,
+    color: 'black',
+    marginTop: 5,
+    marginLeft: 25,
   },
 });
